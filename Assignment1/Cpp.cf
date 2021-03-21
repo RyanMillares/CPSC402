@@ -17,14 +17,23 @@ SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
 
+
 terminator Stm "" ;
+
+
+EQConst.    Exp15 ::= QualConst ;
+EConstDef.  QualConst ::= [Name] ;
+EName.      Name ::= Id ;
+ETemplate.  Name ::= Name "<" Type ">" ;
+separator nonempty Name "::" ; 
 
 ETrue.   Exp15  ::= "true" ;
 EFalse.  Exp15  ::= "false" ;
 EInt.    Exp15  ::= Integer ;
 EDouble. Exp15  ::= Double ;
 EString. Exp15  ::= String ;
-EId.     Exp15  ::= Id ; 
+EId.     Exp15  ::= Id ;
+
 
 EApp.    Exp15  ::= Id "(" [Exp] ")" ;
 
@@ -33,6 +42,9 @@ EPDecr.  Exp14  ::= Exp15 "--" ;
 
 EIncr.   Exp13  ::= "++" Exp14 ;
 EDecr.   Exp13  ::= "--" Exp14 ;
+ELeft.   Exp10  ::= Exp10 "<<" Exp11 ;
+ERight.  Exp10  ::= Exp10 ">>" Exp11 ;
+
 
 ETimes.  Exp12  ::= Exp12 "*"  Exp13 ;
 EDiv.    Exp12  ::= Exp12 "/"  Exp13 ;
@@ -47,6 +59,8 @@ ENEq.    Exp8   ::= Exp8  "!=" Exp9 ;
 EAnd.    Exp4   ::= Exp4  "&&" Exp5 ;
 EOr.     Exp3   ::= Exp3  "||" Exp4 ;
 EAss.    Exp2   ::= Exp3 "=" Exp2 ;
+
+
 
 internal ETyped. Exp15 ::= "(" Exp ":" Type ")" ;
 
