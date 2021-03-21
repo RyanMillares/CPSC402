@@ -35,7 +35,7 @@ EFalse.  Exp15  ::= "false" ;
 EInt.    Exp15  ::= Integer ;
 EDouble. Exp15  ::= Double ;
 EString. Exp15  ::= String ;
-EId.     Exp15  ::= Id ;
+
 
 
 EApp.    Exp15  ::= Id "(" [Exp] ")" ;
@@ -45,14 +45,14 @@ EPDecr.  Exp14  ::= Exp15 "--" ;
 
 EIncr.   Exp13  ::= "++" Exp14 ;
 EDecr.   Exp13  ::= "--" Exp14 ;
-ELeft.   Exp10  ::= Exp10 "<<" Exp11 ;
-ERight.  Exp10  ::= Exp10 ">>" Exp11 ;
 
 
 ETimes.  Exp12  ::= Exp12 "*"  Exp13 ;
 EDiv.    Exp12  ::= Exp12 "/"  Exp13 ;
 EPlus.   Exp11  ::= Exp11 "+"  Exp12 ;
 EMinus.  Exp11  ::= Exp11 "-"  Exp12 ;
+ELeft.   Exp10  ::= Exp10 "<<" Exp11 ;
+ERight.  Exp10  ::= Exp10 ">>" Exp11 ;
 ELt.     Exp9   ::= Exp9  "<"  Exp10 ;
 EGt.     Exp9   ::= Exp9  ">"  Exp10 ;
 ELtEq.   Exp9   ::= Exp9  "<=" Exp10 ;
