@@ -25,7 +25,10 @@ EQConst.    Exp15 ::= QualConst ;
 EConstDef.  QualConst ::= [Name] ;
 EName.      Name ::= Id ;
 ETemplate.  Name ::= Name "<" Type ">" ;
-separator nonempty Name "::" ; 
+separator nonempty Name "::" ;
+
+
+
 
 ETrue.   Exp15  ::= "true" ;
 EFalse.  Exp15  ::= "false" ;
@@ -68,7 +71,8 @@ coercions Exp 15 ;
 
 separator Exp "," ;
 
-rules Type   ::= "bool" | "int" | "double" | "void" | "string" ;
+rules Type   ::= "bool" | "int" | "double" | "void" ;
+TypeQualConst.  Type ::= QualConst ;
 
 token Id (letter (letter | digit | '_')*) ;
 
