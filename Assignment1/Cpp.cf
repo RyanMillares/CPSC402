@@ -6,6 +6,7 @@ DUsing.  Def    ::= "using" QualConst ";" ;
 terminator Def "" ;
 
 ADecl.   Arg    ::= Type Id ;
+ATemp.   Arg    ::= "const" Type Id ;
 
 separator Arg "," ;
 
@@ -29,6 +30,7 @@ EQConst.    Exp15 ::= QualConst ;
 EConstDef.  QualConst ::= [Name] ;
 EName.      Name ::= Id ;
 ETemplate.  Name ::= Name "<" Type ">" ;
+ETemplate2. Name ::= Name "&" ;
 separator nonempty Name "::" ;
 
 
@@ -70,7 +72,8 @@ ENEq.    Exp8   ::= Exp8  "!=" Exp9 ;
 EAnd.    Exp4   ::= Exp4  "&&" Exp5 ;
 EOr.     Exp3   ::= Exp3  "||" Exp4 ;
 EAss.    Exp2   ::= Exp3 "=" Exp2 ;
-ECond.   Exp2   ::= Exp2 "?" Exp3 ":" Exp3 ;
+ECond.   Exp2   ::= Exp3 "?" Exp2 ":" Exp2 ;
+EThrow.  Exp1   ::= "throw" Exp1 ;
 
 
 
