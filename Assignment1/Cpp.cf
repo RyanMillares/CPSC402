@@ -1,25 +1,31 @@
 PDefs.   Program ::= [Def] ;
 
 DFun.    Def    ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
+DFun2.   Def    ::= Type Id "(" [Arg] ")" ";" ;
 DUsing.  Def    ::= "using" QualConst ";" ;
+DTypedef. Def   ::= "typedef" Type Id ";" ;
+
 
 terminator Def "" ;
 
 ADecl.   Arg    ::= Type Id ;
+ADecl2.  Arg    ::= Type ;
 ATemp.   Arg    ::= "const" Type Id ;
+-- ATemp2.   Arg   ::= "const" Type "&" ;
+
 
 separator Arg "," ;
 
 SExp.        Stm ::= Exp ";" ;
 SDecls.      Stm ::= Type [Id] ";" ;
-STemp.       Stm ::= Id "<" Type ">" Exp ";" ;
+
 SInit.       Stm ::= Type Id "=" Exp ";" ;
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
-SIf.         Stm ::= "if" "(" Exp ")" Stm ;
+SIf.         Stm ::= "if" "(" Exp ")" Stm ;                           -- pattern match if statements without an else
 SType.       Stm ::= "typedef" Type Id ";" ;
 
 
@@ -29,8 +35,9 @@ terminator Stm "" ;
 EQConst.    Exp15 ::= QualConst ;
 EConstDef.  QualConst ::= [Name] ;
 EName.      Name ::= Id ;
-ETemplate.  Name ::= Name "<" Type ">" ;
-ETemplate2. Name ::= Name "&" ;
+ETemplate.  Name ::= Name "<" [Type] ">" ;
+--ETemplate2. Name ::= Name "&" ;
+
 separator nonempty Name "::" ;
 
 
@@ -52,13 +59,14 @@ EPDecr.  Exp14  ::= Exp15 "--" ;
 EIncr.   Exp13  ::= "++" Exp14 ;
 EDecr.   Exp13  ::= "--" Exp14 ;
 
+ERev.    Exp13  ::= "!" Exp13 ;
 
 ETimes.  Exp12  ::= Exp12 "*"  Exp13 ;
 EDiv.    Exp12  ::= Exp12 "/"  Exp13 ;
 EMod.    Exp12  ::= Exp12 "%"  Exp13 ;
 EPlus.   Exp11  ::= Exp11 "+"  Exp12 ;
 EMinus.  Exp11  ::= Exp11 "-"  Exp12 ;
-ELeft.   Exp10  ::= Exp10 "<<" Exp11 ;
+ELeft.   Exp10  ::= Exp10 "<<" Exp11 ; --left shift would
 ERight.  Exp10  ::= Exp10 ">>" Exp11 ;
 ELt.     Exp9   ::= Exp9  "<"  Exp10 ;
 EGt.     Exp9   ::= Exp9  ">"  Exp10 ;
@@ -81,6 +89,7 @@ coercions Exp 15 ;
 separator Exp "," ;
 
 rules Type   ::= "bool" | "int" | "double" | "void" ;
+separator nonempty Type "," ;
 TypeQualConst.  Type ::= QualConst ;
 
 
