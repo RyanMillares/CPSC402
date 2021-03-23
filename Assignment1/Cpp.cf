@@ -2,16 +2,19 @@ PDefs.   Program ::= [Def] ;
 
 DFun.    Def    ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
 DFun2.   Def    ::= Type Id "(" [Arg] ")" ";" ;
-DUsing.  Def    ::= "using" QualConst ";" ;
-DTypedef. Def   ::= "typedef" Type Id ";" ;
+DUsing.  Def    ::= "using" QualConst ";" ;                          -- handle using statements outside function
+DTypedef. Def   ::= "typedef" Type Id ";" ;                          -- handle typdedefs outside a function
 
 
 terminator Def "" ;
 
 ADecl.   Arg    ::= Type Id ;
-ADecl2.  Arg    ::= Type ;
-ATemp.   Arg    ::= "const" Type Id ;
--- ATemp2.   Arg   ::= "const" Type "&" ;
+ADecl2.  Arg    ::= Type ;                                          -- handle arguments without a name
+ADecl3.   Arg    ::= Type "&" Id ;                                  -- handle normal call by reference arguments
+ADecl4.   Arg    ::= Type "&" ;                                     -- handle call by reference without name
+ADecl5.   Arg    ::= "const" Type "&" Id ;                          -- handle call by reference constant normal
+ATemp.   Arg    ::= "const" Type "&" ;                              -- handle call by reference without name
+
 
 
 separator Arg "," ;
@@ -20,19 +23,24 @@ SExp.        Stm ::= Exp ";" ;
 SDecls.      Stm ::= Type [Id] ";" ;
 
 SInit.       Stm ::= Type Id "=" Exp ";" ;
+
+SConst.      Stm ::= "const" Name "&" Id "=" Exp ";" ;             -- handle constant statements
+SConst2.      Stm ::= "const" Type Id "=" Exp ";" ;             -- handle constant statements
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
+SWhile2.     Stm ::= "while" "(" Exp ")" ";" ;
+SFor.        Stm ::= "for" "(" "Rule::const_iterator i = r.begin()" ";" Exp ";" Exp ")" Stm ;
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
 SIf.         Stm ::= "if" "(" Exp ")" Stm ;                           -- pattern match if statements without an else
-SType.       Stm ::= "typedef" Type Id ";" ;
+SType.       Stm ::= "typedef" Type Id ";" ;                          -- pattern match typedefs that occur within a function, has Type and Id
 
 
 terminator Stm "" ;
 
 
-EQConst.    Exp15 ::= QualConst ;
+EQConst.    Exp15 ::= QualConst ;                                     --
 EConstDef.  QualConst ::= [Name] ;
 EName.      Name ::= Id ;
 ETemplate.  Name ::= Name "<" [Type] ">" ;
@@ -51,7 +59,9 @@ separator nonempty String "" ;
 
 EApp.    Exp15  ::= Id "(" [Exp] ")" ;
 EIndex.  Exp15  ::= Exp15 "[" Exp "]" ;
+EDeref.  Exp14  ::= "*" Exp14 ;
 EDot.    Exp14  ::= Exp14 "." Exp15 ;
+EPoint.  Exp14  ::= Exp14 "->" Exp15 ;
 
 EPIncr.  Exp14  ::= Exp15 "++" ;
 EPDecr.  Exp14  ::= Exp15 "--" ;
