@@ -1,7 +1,7 @@
 PDefs.   Program ::= [Def] ;
 
 DFun.    Def    ::= Type Id "(" [Arg] ")" "{" [Stm] "}" ;
-DFun2.   Def    ::= Type Id "(" [Arg] ")" ";" ;
+DFun2.   Def    ::= Type Id "(" [Arg] ")" ";" ;                    -- handle abstract functions, without definition
 DUsing.  Def    ::= "using" QualConst ";" ;                          -- handle using statements outside function
 DTypedef. Def   ::= "typedef" Type Id ";" ;                          -- handle typdedefs outside a function
 
@@ -21,29 +21,35 @@ separator Arg "," ;
 
 SExp.        Stm ::= Exp ";" ;
 SDecls.      Stm ::= Type [Id] ";" ;
+SInit2.      Stm ::= Type "&" Id "=" Exp ";" ;                     -- initialize call by reference variables in a statement
+SInline.     Stm ::= "inline" Stm ;                                -- recognize inline initilizations
 
 SInit.       Stm ::= Type Id "=" Exp ";" ;
+SRule.       Stm ::= "Rule::const_iterator i = r.begin()" ;
 
 SConst.      Stm ::= "const" Name "&" Id "=" Exp ";" ;             -- handle constant statements
 SConst2.      Stm ::= "const" Type Id "=" Exp ";" ;             -- handle constant statements
 SReturn.     Stm ::= "return" Exp ";" ;
 SReturnVoid. Stm ::= "return" ";" ;
+SStruct.     Stm ::= "struct" Id "{" [Stm] "}" ";" ;              --handle structure definitions
 SWhile.      Stm ::= "while" "(" Exp ")" Stm ;
-SWhile2.     Stm ::= "while" "(" Exp ")" ";" ;
-SFor.        Stm ::= "for" "(" "Rule::const_iterator i = r.begin()" ";" Exp ";" Exp ")" Stm ;
+SWhile2.     Stm ::= "while" "(" Exp ")" ";" ;                   -- handle while loops with only 1 line
+SFor.        Stm ::= "for" "(" Stm ";" Exp ";" Exp ")" Stm ;      --handle the for loop function with a statement, and 2 expressions
 SBlock.      Stm ::= "{" [Stm] "}" ;
 SIfElse.     Stm ::= "if" "(" Exp ")" Stm "else" Stm ;
 SIf.         Stm ::= "if" "(" Exp ")" Stm ;                           -- pattern match if statements without an else
 SType.       Stm ::= "typedef" Type Id ";" ;                          -- pattern match typedefs that occur within a function, has Type and Id
+-- SDo1.        Stm ::= "do" "{" [Stm] "}" "while" "(" Exp ")" ";" ;       -- pattern match do while statements
+-- SDo2.        Stm ::= "do" [Stm] "while" "(" Exp ")" ";" ;               -- pattern match do whiles that lack brackets
 
 
 terminator Stm "" ;
 
 
-EQConst.    Exp15 ::= QualConst ;                                     --
-EConstDef.  QualConst ::= [Name] ;
-EName.      Name ::= Id ;
-ETemplate.  Name ::= Name "<" [Type] ">" ;
+EQConst.    Exp15 ::= QualConst ;                                     -- qualified constant as expressions
+EConstDef.  QualConst ::= [Name] ;                                    -- define qualified constant as a list of names
+EName.      Name ::= Id ;                                             -- define Names as all built-in identifiers
+ETemplate.  Name ::= Name "<" [Type] ">" ;                            -- pattern match for template types
 --ETemplate2. Name ::= Name "&" ;
 
 separator nonempty Name "::" ;
@@ -53,15 +59,15 @@ ETrue.   Exp15  ::= "true" ;
 EFalse.  Exp15  ::= "false" ;
 EInt.    Exp15  ::= Integer ;
 EDouble. Exp15  ::= Double ;
-EString. Exp15  ::= [String] ;
-separator nonempty String "" ;
+EString. Exp15  ::= [String] ;                                       -- recognize that many strings can be passed together separated by empty string
+separator nonempty String "" ;                                       -- indicates the empty string as a nonempty separator for strings
 
 
 EApp.    Exp15  ::= Id "(" [Exp] ")" ;
 EIndex.  Exp15  ::= Exp15 "[" Exp "]" ;
-EDeref.  Exp14  ::= "*" Exp14 ;
-EDot.    Exp14  ::= Exp14 "." Exp15 ;
-EPoint.  Exp14  ::= Exp14 "->" Exp15 ;
+EDeref.  Exp14  ::= "*" Exp14 ;                                      -- matches for dereferencing a variable
+EDot.    Exp14  ::= Exp14 "." Exp15 ;                                -- matches dot use for function or variable call of another class or struct
+EPoint.  Exp14  ::= Exp14 "->" Exp15 ;                               -- matches pointer structure in c plus plus
 
 EPIncr.  Exp14  ::= Exp15 "++" ;
 EPDecr.  Exp14  ::= Exp15 "--" ;
@@ -69,15 +75,15 @@ EPDecr.  Exp14  ::= Exp15 "--" ;
 EIncr.   Exp13  ::= "++" Exp14 ;
 EDecr.   Exp13  ::= "--" Exp14 ;
 
-ERev.    Exp13  ::= "!" Exp13 ;
+ERev.    Exp13  ::= "!" Exp13 ;                                      -- match the NOT operator on boolean values
 
 ETimes.  Exp12  ::= Exp12 "*"  Exp13 ;
 EDiv.    Exp12  ::= Exp12 "/"  Exp13 ;
 EMod.    Exp12  ::= Exp12 "%"  Exp13 ;
 EPlus.   Exp11  ::= Exp11 "+"  Exp12 ;
 EMinus.  Exp11  ::= Exp11 "-"  Exp12 ;
-ELeft.   Exp10  ::= Exp10 "<<" Exp11 ; --left shift would
-ERight.  Exp10  ::= Exp10 ">>" Exp11 ;
+ELeft.   Exp10  ::= Exp10 "<<" Exp11 ;                              --left shift, for piping to cout
+ERight.  Exp10  ::= Exp10 ">>" Exp11 ;                              -- right shift, for piping a cinput to a variable
 ELt.     Exp9   ::= Exp9  "<"  Exp10 ;
 EGt.     Exp9   ::= Exp9  ">"  Exp10 ;
 ELtEq.   Exp9   ::= Exp9  "<=" Exp10 ;
@@ -87,8 +93,10 @@ ENEq.    Exp8   ::= Exp8  "!=" Exp9 ;
 EAnd.    Exp4   ::= Exp4  "&&" Exp5 ;
 EOr.     Exp3   ::= Exp3  "||" Exp4 ;
 EAss.    Exp2   ::= Exp3 "=" Exp2 ;
-ECond.   Exp2   ::= Exp3 "?" Exp2 ":" Exp2 ;
-EThrow.  Exp1   ::= "throw" Exp1 ;
+EAss2.   Exp2   ::= Exp2 "+=" Exp3 ;                                -- basic incrementing for non-1 numbers
+EAss3.   Exp2   ::= Exp2 "-=" Exp3 ;                                -- basic decrementing for non-1 numbers
+ECond.   Exp2   ::= Exp3 "?" Exp2 ":" Exp2 ;                        -- pattern match for ternary or conditional operations
+EThrow.  Exp1   ::= "throw" Exp1 ;                                  -- match throw expressions
 
 
 
@@ -99,8 +107,8 @@ coercions Exp 15 ;
 separator Exp "," ;
 
 rules Type   ::= "bool" | "int" | "double" | "void" ;
-separator nonempty Type "," ;
-TypeQualConst.  Type ::= QualConst ;
+separator nonempty Type "," ;                                       -- types can be separated by a comma
+TypeQualConst.  Type ::= QualConst ;                                -- recognize qualified constants as a valid type
 
 
 
