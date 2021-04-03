@@ -129,8 +129,9 @@ checkStm env (SReturn e) ty = do
     checkExp env e ty
     return env
 
--- checkStm env (SInit ty' i e) ty = do
+checkStm env (SInit ty' i e) ty = do
     -- similar to SDecls, but not need for foldM
+    (\e i -> insertVar e i ty') env i
 
 -- checkStm env SReturnVoid Type_void =
 -- the next case is only executed in case ty is not Type_void
@@ -162,26 +163,32 @@ In ty <- inferTypExp env e we have
 -}
 inferTypeExp :: Env -> Exp -> Err Type
 inferTypeExp env (EInt _) = return Type_int
--- inferTypeExp env (EDouble _) =
--- inferTypeExp env (EString _) =
--- inferTypeExp env (EId i) =
+inferTypeExp env (EDouble _) = return Type_double
+inferTypeExp env (EString _) = return Type_string
+inferTypeExp env (EId i) = do
+    ty <- lookupVar i env
+    return ty
     -- use lookupVar
--- inferTypeExp env (EApp i exps) = do
+inferTypeExp env (EApp i exps) = do
+    ty <- lookupFun env i
+    forM_ exps (flip (checkExp env) (snd ty))
+    return (snd ty)
+
     -- use lookupFun
     -- use forM_ to iterate checkExp over exps
--- inferTypeExp env (EPIncr e) =
+inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
     -- use inferTypeOverloadedExp
 -- inferTypeExp env (EPDecr e) =
 -- inferTypeExp env (EIncr e) =
 -- inferTypeExp env (EDecr e) =
 -- inferTypeExp env (ETimes e1 e2) =
 -- inferTypeExp env (EDiv e1 e2) =
-inferTypeExp env (EPlus e1 e2) = return Type_int
+inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
 -- inferTypeExp env (EMinus e1 e2) =
 -- inferTypeExp env (ELt e1 e2) = do
--- inferTypeExp env (EGt e1 e2) =
--- inferTypeExp env (ELtEq e1 e2) =
--- inferTypeExp env (EGtEq e1 e2) =
+-- inferTypeExp env (EGt e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
+-- inferTypeExp env (ELtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
+-- inferTypeExp env (EGtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
 -- inferTypeExp env (EEq e1 e2) = do
 -- inferTypeExp env (ENEq e1 e2) =
 -- inferTypeExp env (EAnd e1 e2) = do
