@@ -165,13 +165,15 @@ inferTypeExp :: Env -> Exp -> Err Type
 inferTypeExp env (EInt _) = return Type_int
 inferTypeExp env (EDouble _) = return Type_double
 inferTypeExp env (EString _) = return Type_string
+inferTypeExp env (EFalse) = return Type_bool
+inferTypeExp env (ETrue) = return Type_bool
 inferTypeExp env (EId i) = do
     ty <- lookupVar i env
     return ty
     -- use lookupVar
 inferTypeExp env (EApp i exps) = do
     ty <- lookupFun env i
-    forM_ exps (flip (checkExp env) (snd ty))
+    forM_ (zip exps (fst ty)) (\p -> checkExp  env (fst p) (snd p))
     return (snd ty)
 
     -- use lookupFun
