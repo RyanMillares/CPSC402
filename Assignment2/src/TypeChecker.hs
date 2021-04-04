@@ -169,7 +169,7 @@ inferTypeExp env (EFalse) = return Type_bool
 inferTypeExp env (ETrue) = return Type_bool
 inferTypeExp env (EId i) = do
     ty <- lookupVar i env
-    return ty 
+    return ty
     -- use lookupVar
 inferTypeExp env (EApp i exps) = do
     ty <- lookupFun env i
@@ -186,7 +186,7 @@ inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]
 -- inferTypeExp env (ETimes e1 e2) =
 -- inferTypeExp env (EDiv e1 e2) =
 inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
--- inferTypeExp env (EMinus e1 e2) =
+inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
 -- inferTypeExp env (ELt e1 e2) = do
 -- inferTypeExp env (EGt e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
 -- inferTypeExp env (ELtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
