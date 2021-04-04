@@ -169,7 +169,7 @@ inferTypeExp env (EFalse) = return Type_bool
 inferTypeExp env (ETrue) = return Type_bool
 inferTypeExp env (EId i) = do
     ty <- lookupVar i env
-    return ty
+    return ty 
     -- use lookupVar
 inferTypeExp env (EApp i exps) = do
     ty <- lookupFun env i
