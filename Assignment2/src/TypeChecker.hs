@@ -207,10 +207,22 @@ inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_
 -- inferTypeExp env (EGt e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
 -- inferTypeExp env (ELtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
 -- inferTypeExp env (EGtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
--- inferTypeExp env (EEq e1 e2) = do
--- inferTypeExp env (ENEq e1 e2) =
--- inferTypeExp env (EAnd e1 e2) = do
--- inferTypeExp env (EOr e1 e2) =
+inferTypeExp env (EEq e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (ENEq e1 e2) = do 
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (EAnd e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (EOr e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
 
 inferTypeExp env (EAss e1 e2) = do
     ty <- inferTypeExp env e1
