@@ -131,7 +131,10 @@ checkStm env (SReturn e) ty = do
 
 checkStm env (SInit ty' i e) ty = do
     -- similar to SDecls, but not need for foldM
-    (\e i -> insertVar e i ty') env i
+    -- (\e i -> insertVar e i ty') env i
+    env' <- (\e i -> insertVar e i ty') env i
+    checkExp env' e ty'
+    return env'
 
 -- checkStm env SReturnVoid Type_void =
 -- the next case is only executed in case ty is not Type_void
@@ -165,20 +168,22 @@ inferTypeExp :: Env -> Exp -> Err Type
 inferTypeExp env (EInt _) = return Type_int
 inferTypeExp env (EDouble _) = return Type_double
 inferTypeExp env (EString _) = return Type_string
-inferTypeExp env (EFalse) = return Type_bool
-inferTypeExp env (ETrue) = return Type_bool
-inferTypeExp env (EId i) = do
-    ty <- lookupVar i env
-    return ty
+inferTypeExp env EFalse = return Type_bool
+inferTypeExp env ETrue = return Type_bool
+inferTypeExp env (EId i) = lookupVar i env
+    
     -- use lookupVar
 inferTypeExp env (EApp i exps) = do
     ty <- lookupFun env i
-    forM_ (zip exps (fst ty)) (\p -> checkExp  env (fst p) (snd p))
+
+    unless (length exps == length (fst ty)) $
+        fail "Incorrect number of arguments"
+    forM_ (zip exps (fst ty)) (uncurry (checkExp env))
     return (snd ty)
 
     -- use lookupFun
     -- use forM_ to iterate checkExp over exps
-inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
+-- inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
     -- use inferTypeOverloadedExp
 -- inferTypeExp env (EPDecr e) =
 -- inferTypeExp env (EIncr e) =
