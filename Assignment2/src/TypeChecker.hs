@@ -203,10 +203,22 @@ inferTypeExp env (ETimes e1 e2) = inferTypeOverloadedExp env (Alternative [Type_
 inferTypeExp env (EDiv e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
 inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
 inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
--- inferTypeExp env (ELt e1 e2) = do
--- inferTypeExp env (EGt e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
--- inferTypeExp env (ELtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
--- inferTypeExp env (EGtEq e1 e2) = inferTypeOverloadedExp env (Alternative [Type_bool]) e1 [e2]
+inferTypeExp env (ELt e1 e2) = do 
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (EGt e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (ELtEq e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
+inferTypeExp env (EGtEq e1 e2) = do
+    ty <- inferTypeExp env e1
+    checkExp env e2 ty
+    return Type_bool
 inferTypeExp env (EEq e1 e2) = do
     ty <- inferTypeExp env e1
     checkExp env e2 ty
