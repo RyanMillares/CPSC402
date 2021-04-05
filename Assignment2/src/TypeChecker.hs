@@ -136,20 +136,31 @@ checkStm env (SInit ty' i e) ty = do
     checkExp env' e ty'
     return env'
 
--- checkStm env SReturnVoid Type_void =
+checkStm env SReturnVoid Type_void = return env
 -- the next case is only executed in case ty is not Type_void
--- checkStm env SReturnVoid ty = do
+checkStm env SReturnVoid ty = do
     -- return a typeMismatchError
+    fail $ typeMismatchError "Returning void" Type_void ty
 
--- checkStm env (SWhile e stm) ty = do
+checkStm env (SWhile e stm) ty = do
     -- use newBlock
-
--- checkStm env (SBlock stms) ty = do
+    checkExp env e Type_bool 
+    env' <- Ok (newBlock env)
+    checkStm env' stm ty
+    return env
+checkStm env (SBlock stms) ty = do
     -- use newBlock
     -- use foldM_ to fold checkStm over all stms
+    env' <- Ok (newBlock env)
+    foldM_ (\e stmt -> checkStm e stmt ty) env' stms
+    return env
 
--- checkStm env (SIfElse e stm1 stm2) ty = do
-    -- use newBlock in both branches
+
+checkStm env (SIfElse e stm1 stm2) ty = do
+    checkExp env e Type_bool
+    foldM_(\e s -> checkStm e s ty) (newBlock env) [stm1]
+    foldM_(\e s -> checkStm e s ty) (newBlock env) [stm2]
+    return env
 
 {-
 Once you have all cases you can delete the next line which is only needed to catch all cases that are not yet implemented.
@@ -171,7 +182,7 @@ inferTypeExp env (EString _) = return Type_string
 inferTypeExp env EFalse = return Type_bool
 inferTypeExp env ETrue = return Type_bool
 inferTypeExp env (EId i) = lookupVar i env
-    
+
     -- use lookupVar
 inferTypeExp env (EApp i exps) = do
     ty <- lookupFun env i
