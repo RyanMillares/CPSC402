@@ -194,15 +194,15 @@ inferTypeExp env (EApp i exps) = do
 
     -- use lookupFun
     -- use forM_ to iterate checkExp over exps
-inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
+inferTypeExp env (EPIncr e) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e []
     -- use inferTypeOverloadedExp
-inferTypeExp env (EPDecr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
-inferTypeExp env (EIncr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
-inferTypeExp env (EDecr e) = inferTypeOverloadedExp env (Alternative [Type_int]) e []
-inferTypeExp env (ETimes e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
-inferTypeExp env (EDiv e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
-inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
-inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int]) e1 [e2]
+inferTypeExp env (EPDecr e) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e []
+inferTypeExp env (EIncr e) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e []
+inferTypeExp env (EDecr e) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e []
+inferTypeExp env (ETimes e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
+inferTypeExp env (EDiv e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
+inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
+inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
 inferTypeExp env (ELt e1 e2) = do 
     ty <- inferTypeExp env e1
     checkExp env e2 ty
