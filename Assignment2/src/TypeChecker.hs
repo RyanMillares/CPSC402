@@ -144,7 +144,7 @@ checkStm env SReturnVoid ty = do
 
 checkStm env (SWhile e stm) ty = do
     -- use newBlock
-    checkExp env e Type_bool 
+    checkExp env e Type_bool
     env' <- Ok (newBlock env)
     checkStm env' stm ty
     return env
@@ -203,14 +203,20 @@ inferTypeExp env (ETimes e1 e2) = inferTypeOverloadedExp env (Alternative [Type_
 inferTypeExp env (EDiv e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
 inferTypeExp env (EPlus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
 inferTypeExp env (EMinus e1 e2) = inferTypeOverloadedExp env (Alternative [Type_int, Type_double ]) e1 [e2]
-inferTypeExp env (ELt e1 e2) = do 
-    ty <- inferTypeExp env e1
-    checkExp env e2 ty
-    return Type_bool
+inferTypeExp env (ELt e1 e2) = do
+    if e1 == ETrue || e1 == EFalse ||e2 == ETrue || e2 == EFalse 
+        then fail "Cannot have true or false in comparison"
+    else do
+        ty <- inferTypeExp env e1
+        checkExp env e2 ty
+        return Type_bool
 inferTypeExp env (EGt e1 e2) = do
-    ty <- inferTypeExp env e1
-    checkExp env e2 ty
-    return Type_bool
+    if e1 == ETrue || e1 == EFalse ||e2 == ETrue || e2 == EFalse 
+        then fail "Cannot have true or false in comparison"
+    else do
+        ty <- inferTypeExp env e1
+        checkExp env e2 ty
+        return Type_bool
 inferTypeExp env (ELtEq e1 e2) = do
     ty <- inferTypeExp env e1
     checkExp env e2 ty
@@ -223,7 +229,7 @@ inferTypeExp env (EEq e1 e2) = do
     ty <- inferTypeExp env e1
     checkExp env e2 ty
     return Type_bool
-inferTypeExp env (ENEq e1 e2) = do 
+inferTypeExp env (ENEq e1 e2) = do
     ty <- inferTypeExp env e1
     checkExp env e2 ty
     return Type_bool
