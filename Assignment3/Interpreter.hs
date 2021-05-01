@@ -188,15 +188,18 @@ evalStm stm =
 
 evalExp :: Interpreter i => Exp -> i Value
 evalExp ETrue = return VTrue
-{-
-evalExp EFalse = 
--}
+
+evalExp EFalse = return VFalse
+
 evalExp (EInt i) = return $ VInt i
-{-
-evalExp (EDouble d) = 
-evalExp (EString _) = 
-evalExp (EId i) = 
--}
+
+evalExp (EDouble d) = return $ VDouble d
+
+evalExp (EString _) = return $ VUndefined
+
+evalExp (EId i) = do
+    ty <- lookupContext i
+    return ty
 evalExp (EApp i exps) = do
     vals <- mapM evalExp exps
     case (i, vals) of
