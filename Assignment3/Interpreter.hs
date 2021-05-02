@@ -295,9 +295,6 @@ evalExp (ELtEq e1 e2) = do
        else
            return VFalse
 evalExp (EGtEq e1 e2) = do
-    {-first getting the values of each expression to use
-    in evaluating > and ==, rather than evaluating
-    the expression twice-}
     val1 <- evalExp e1
     val2 <- evalExp e2
     res  <- gtValue val1 val2
