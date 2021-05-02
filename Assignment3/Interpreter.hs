@@ -280,10 +280,10 @@ evalExp (ELtEq e1 e2) = do
    val1 <- evalExp e1
    val2 <- evalExp e2
    res  <- ltValue val1 val2
-   if (res == VTrue) then
+   if res == VTrue then
        return VTrue
    else do
-       if (val1 == val2) then
+       if val1 == val2 then
            return VTrue
        else
            return VFalse
@@ -291,44 +291,49 @@ evalExp (EGtEq e1 e2) = do
     val1 <- evalExp e1
     val2 <- evalExp e2
     res  <- gtValue val1 val2
-    if (res == VTrue) then
+    if res == VTrue then
         return VTrue
     else do
-        if (val1 == val2) then
+        if val1 == val2 then
             return VTrue
         else
             return VFalse
 evalExp (EEq e1 e2) = do
     val  <- evalExp e1
     val' <- evalExp e2
-    if (val == val') then 
+    if val == val' then 
         return VTrue
     else
         return VFalse
 evalExp (ENEq e1 e2) = do
     val  <- evalExp e1
     val' <- evalExp e2
-    if (val == val') then 
+    if val == val' then 
         return VFalse
     else
         return VTrue
 evalExp (EAnd e1 e2) = do
     val  <- evalExp e1
-    if (val == VTrue) then do
-        val' <- evalExp e2
-        return val'
+    if val == VTrue then
+        do evalExp e2
+
     else
         return VFalse
 evalExp (EOr e1 e2) = do
     val  <- evalExp e1
-    if (val == VFalse) then do
-        val' <- evalExp e2
-        return val'
+    if val == VFalse then 
+        do evalExp e2
+
     else
         return VTrue
--- evalExp (EAss (EId i) e) = 
--- evalExp (EAss _ _) = 
--- evalExp (ETyped e _) = 
+evalExp (EAss (EId i) e) = do
+    val <- evalExp e
+    updateContext i val
+    return val
+evalExp (EAss _ _) = fail $ "Missing id or expression.\n"
+evalExp (ETyped e _) = 
+    do evalExp e
+
 
 evalExp e = fail $ "Missing case in evalExp." ++ printTree e ++ "\n"
 
