@@ -184,10 +184,23 @@ evalStm (SReturn e) = do
     return $ Just v
 
 evalStm (SBlock stms) = pushPop $ evalStms stms
-{-
-evalStm (SWhile e stm) = 
-evalStm (SIfElse e stm1 stm2) = 
--}
+evalStm (SWhile e stm) = do
+    v <- evalExp e
+    if (v == VTrue) then do
+        val <- pushPop $ evalStm stm
+        if (val == Nothing) then do
+            evalStm (SWhile e stm)
+        else
+            return val
+    else
+        return Nothing
+evalStm (SIfElse e stm1 stm2) = do
+    v <- pushPop $ evalExp e
+    if (v == VTrue) then
+        pushPop $ evalStm stm1
+    else
+        pushPop $ evalStm stm2
+
 evalStm stm = 
     fail $ "Missing case in evalStm " ++ printTree stm ++ "\n"
 
